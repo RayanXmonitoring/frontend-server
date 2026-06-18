@@ -3,12 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteDevice } from '@/lib/firebase/firestore';
-import { toast } from 'react-hot-toast';
-import { Delete, Visibility, MoreVert } from '@mui/icons-material';
+import toast from 'react-hot-toast';
+import { Delete, Visibility, Devices } from '@mui/icons-material';
 
 export default function DeviceList({ devices }) {
   const router = useRouter();
-  const [menuOpen, setMenuOpen] = useState(null);
 
   const getStatusColor = (status) => {
     switch (status) {
