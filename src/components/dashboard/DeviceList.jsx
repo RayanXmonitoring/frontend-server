@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteDevice } from '@/lib/firebase/firestore';
 import { toast } from 'react-hot-toast';
-import { MoreVert, Delete, Visibility } from '@mui/icons-material';
+import { Delete, Visibility, MoreVert } from '@mui/icons-material';
 
 export default function DeviceList({ devices }) {
   const router = useRouter();
@@ -23,6 +23,15 @@ export default function DeviceList({ devices }) {
     }
   };
 
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'online': return '🟢';
+      case 'offline': return '🔴';
+      case 'lost': return '🟡';
+      default: return '⚪';
+    }
+  };
+
   const handleDelete = async (deviceId) => {
     if (!confirm('Apakah Anda yakin ingin menghapus perangkat ini?')) return;
     
@@ -38,6 +47,7 @@ export default function DeviceList({ devices }) {
   if (devices.length === 0) {
     return (
       <div className="text-center py-8">
+        <Devices className="w-12 h-12 mx-auto text-gray-400 mb-2" />
         <p className="text-gray-500 dark:text-gray-400">Belum ada perangkat yang terhubung</p>
       </div>
     );
@@ -54,7 +64,7 @@ export default function DeviceList({ devices }) {
             <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
               Status
             </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 hidden md:table-cell">
               Terakhir Aktif
             </th>
             <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
@@ -63,41 +73,42 @@ export default function DeviceList({ devices }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-          {devices.map((device) => (
+          {devices.slice(0, 5).map((device) => (
             <tr key={device.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
               <td className="px-4 py-3">
                 <div>
                   <p className="font-medium text-gray-800 dark:text-white">
                     {device.deviceName || 'Perangkat Tanpa Nama'}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]">
                     ID: {device.deviceId}
                   </p>
                 </div>
               </td>
               <td className="px-4 py-3">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(device.status)}`}>
-                  {device.status === 'online' ? '🟢 Online' : 
-                   device.status === 'offline' ? '🔴 Offline' : 
-                   '🟡 Lost Mode'}
+                <span className={`px-2 py-1 rounded-full text-xs font-medium inline-flex items-center space-x-1 ${getStatusColor(device.status)}`}>
+                  <span>{getStatusIcon(device.status)}</span>
+                  <span className="capitalize">{device.status || 'Unknown'}</span>
                 </span>
               </td>
-              <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
+              <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300 hidden md:table-cell">
                 {device.lastSeen ? new Date(device.lastSeen).toLocaleString('id-ID') : '-'}
               </td>
               <td className="px-4 py-3">
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => router.push(`/devices/${device.id}`)}
-                    className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                    className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                    title="Lihat Detail"
                   >
-                    <Visibility />
+                    <Visibility className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => handleDelete(device.id)}
-                    className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                    className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                    title="Hapus"
                   >
-                    <Delete />
+                    <Delete className="w-5 h-5" />
                   </button>
                 </div>
               </td>
@@ -105,6 +116,16 @@ export default function DeviceList({ devices }) {
           ))}
         </tbody>
       </table>
+      {devices.length > 5 && (
+        <div className="text-center py-3 border-t border-gray-200 dark:border-gray-700">
+          <button
+            onClick={() => router.push('/devices')}
+            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
+          >
+            Lihat semua perangkat ({devices.length})
+          </button>
+        </div>
+      )}
     </div>
   );
-              }
+}
