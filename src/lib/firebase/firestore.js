@@ -133,6 +133,30 @@ export const getDevices = async (userId = null) => {
   }
 };
 
+export const getDevice = async (deviceId) => {
+  try {
+    const deviceDoc = await getDoc(doc(db, 'devices', deviceId));
+    if (deviceDoc.exists()) {
+      return { device: deviceDoc.data(), error: null };
+    }
+    return { device: null, error: 'Device not found' };
+  } catch (error) {
+    return { device: null, error: error.message };
+  }
+};
+
+export const updateDevice = async (deviceId, data) => {
+  try {
+    await updateDoc(doc(db, 'devices', deviceId), {
+      ...data,
+      updatedAt: serverTimestamp()
+    });
+    return { success: true, error: null };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
 export const updateDeviceStatus = async (deviceId, status) => {
   try {
     await updateDoc(doc(db, 'devices', deviceId), {
@@ -177,9 +201,9 @@ export const saveSMS = async (smsData) => {
   }
 };
 
-export const getSMSHistory = async (deviceId = null, limit = 100) => {
+export const getSMSHistory = async (deviceId = null, limitCount = 100) => {
   try {
-    let q = query(smsCollection, orderBy('createdAt', 'desc'), limit(limit));
+    let q = query(smsCollection, orderBy('createdAt', 'desc'), limit(limitCount));
     if (deviceId) {
       q = query(q, where('deviceId', '==', deviceId));
     }
@@ -300,5 +324,18 @@ export const useEnrollmentPIN = async (pin, userId) => {
     return { success: true, error: null };
   } catch (error) {
     return { success: false, error: error.message };
+  }
+};
+
+export const getEnrollmentPINs = async () => {
+  try {
+    const querySnapshot = await getDocs(enrollmentCollection);
+    const pins = [];
+    querySnapshot.forEach((doc) => {
+      pins.push({ id: doc.id, ...doc.data() });
+    });
+    return { pins, error: null };
+  } catch (error) {
+    return { pins: [], error: error.message };
   }
 };
