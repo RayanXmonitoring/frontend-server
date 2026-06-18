@@ -4,9 +4,18 @@ const nextConfig = {
   swcMinify: true,
   images: {
     domains: ['firebasestorage.googleapis.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
+  // Hapus experimental.serverActions karena sudah default
   experimental: {
-    serverActions: true,
+    // Kosongkan atau hapus serverActions
   },
   async headers() {
     return [
@@ -20,6 +29,23 @@ const nextConfig = {
         ],
       },
     ];
+  },
+  // Webpack config untuk fix undici
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+        stream: false,
+        http: false,
+        https: false,
+        zlib: false,
+      };
+    }
+    return config;
   },
 };
 
