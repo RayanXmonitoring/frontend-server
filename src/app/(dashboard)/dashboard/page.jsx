@@ -5,7 +5,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getDevices } from '@/lib/firebase/firestore';
 import DeviceStats from '@/components/dashboard/DeviceStats';
 import DeviceList from '@/components/dashboard/DeviceList';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
+import { Refresh } from '@mui/icons-material';
 
 export default function DashboardPage() {
   const { user, role, userData } = useAuth();
@@ -25,7 +26,7 @@ export default function DashboardPage() {
   const fetchDevices = async () => {
     setLoading(true);
     try {
-      const userId = role === 'admin' ? null : user.uid;
+      const userId = role === 'admin' ? null : user?.uid;
       const { devices: deviceList, error } = await getDevices(userId);
       
       if (error) {
@@ -52,21 +53,33 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-          Dashboard
-        </h1>
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          Welcome back, {userData?.displayName || 'User'}!
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Dashboard</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Welcome back, {userData?.displayName || 'User'}!
+          </p>
         </div>
+        <button
+          onClick={fetchDevices}
+          className="btn-primary flex items-center space-x-2 text-sm"
+        >
+          <Refresh className="w-4 h-4" />
+          <span>Refresh</span>
+        </button>
       </div>
 
       <DeviceStats stats={stats} />
 
       <div className="dashboard-card">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-          Daftar Perangkat
-        </h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+            Daftar Perangkat
+          </h2>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {devices.length} perangkat
+          </span>
+        </div>
         {loading ? (
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
