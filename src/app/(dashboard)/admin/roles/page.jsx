@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getDocs, query, orderBy, doc, updateDoc } from 'firebase/firestore';
 import { usersCollection } from '@/lib/firebase/firestore';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { AdminPanelSettings, Refresh, Search, Save } from '@mui/icons-material';
 
 export default function AdminRolesPage() {
