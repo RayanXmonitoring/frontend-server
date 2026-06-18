@@ -151,4 +151,93 @@ export default function AdminUsersPage() {
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
                     User
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
+                    Role
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
+                    Terdaftar
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
+                    Aksi
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {filteredUsers.map((user) => (
+                  <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <td className="px-4 py-3">
+                      <div>
+                        <p className="font-medium text-gray-800 dark:text-white">
+                          {user.displayName || 'Tanpa Nama'}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {user.email}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {getRoleBadge(user.role)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        user.isSuspended 
+                          ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                          : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                      }`}>
+                        {user.isSuspended ? '⛔ Nonaktif' : '✅ Aktif'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
+                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString('id-ID') : '-'}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setIsModalOpen(true);
+                          }}
+                          className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                          title="Edit"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleSuspend(user.id, user.isSuspended)}
+                          className={`p-1 ${
+                            user.isSuspended
+                              ? 'text-green-600 hover:text-green-800 dark:text-green-400'
+                              : 'text-yellow-600 hover:text-yellow-800 dark:text-yellow-400'
+                          }`}
+                          title={user.isSuspended ? 'Aktifkan' : 'Nonaktifkan'}
+                        >
+                          {user.isSuspended ? <CheckCircle className="w-4 h-4" /> : <Block className="w-4 h-4" />}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(user.id)}
+                          className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                          title="Hapus"
+                        >
+                          <Delete className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {filteredUsers.length === 0 && (
+            <div className="text-center py-8">
+              <People className="w-12 h-12 mx-auto text-gray-400 mb-2" />
+              <p className="text-gray-500 dark:text-gray-400">Tidak ada user ditemukan</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+                        }
