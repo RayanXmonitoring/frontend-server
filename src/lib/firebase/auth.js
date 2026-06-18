@@ -32,7 +32,6 @@ export const registerWithEmailPassword = async (email, password, displayName) =>
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     
-    // Create user document
     await setDoc(doc(db, 'users', userCredential.user.uid), {
       uid: userCredential.user.uid,
       email: email,
