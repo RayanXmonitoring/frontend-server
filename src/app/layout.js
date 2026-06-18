@@ -1,5 +1,6 @@
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
+import SessionProviderWrapper from '@/components/providers/SessionProvider';
 import { Inter } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 
@@ -14,10 +15,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="id">
       <body className={inter.className}>
-        <AuthProvider>
-          {children}
-          <Toaster position="top-right" />
-        </AuthProvider>
+        <SessionProviderWrapper>
+          <AuthProvider>
+            {children}
+            <Toaster position="top-right" />
+          </AuthProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   );
