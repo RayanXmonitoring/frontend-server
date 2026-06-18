@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { loginWithEmailPassword } from '@/lib/firebase/auth';
+import { signIn } from 'next-auth/react';
 import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -24,17 +24,22 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { user, error } = await loginWithEmailPassword(email, password);
-      
-      if (error) {
-        toast.error('Login gagal: ' + error);
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error('Login gagal: ' + result.error);
         setLoading(false);
         return;
       }
 
-      if (user) {
+      if (result?.ok) {
         toast.success('Login berhasil!');
         router.push('/dashboard');
+        router.refresh();
       }
     } catch (error) {
       toast.error('Terjadi kesalahan: ' + error.message);
@@ -68,6 +73,7 @@ export default function LoginPage() {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="Masukkan email"
               required
+              autoComplete="email"
             />
           </div>
 
@@ -83,6 +89,7 @@ export default function LoginPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 placeholder="Masukkan password"
                 required
+                autoComplete="current-password"
               />
               <button
                 type="button"
