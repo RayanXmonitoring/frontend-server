@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
               router.push('/login?error=Akun Anda telah ditangguhkan');
             }
           } else {
-            // User document doesn't exist, create one
+            // User document doesn't exist, create one with default role
             console.warn('User document not found for:', authUser.uid);
           }
         } catch (error) {
