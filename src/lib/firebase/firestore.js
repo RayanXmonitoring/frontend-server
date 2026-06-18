@@ -18,22 +18,12 @@ import {
 } from 'firebase/firestore';
 import { db } from './config';
 
-// Users Collection
+// Collections
 export const usersCollection = collection(db, 'users');
-
-// Devices Collection
 export const devicesCollection = collection(db, 'devices');
-
-// SMS Collection
 export const smsCollection = collection(db, 'sms');
-
-// Gallery Collection
 export const galleryCollection = collection(db, 'gallery');
-
-// Licenses Collection
 export const licensesCollection = collection(db, 'licenses');
-
-// Enrollment PIN Collection
 export const enrollmentCollection = collection(db, 'enrollment_pins');
 
 // User Functions
@@ -177,15 +167,6 @@ export const deleteDevice = async (deviceId) => {
   } catch (error) {
     return { success: false, error: error.message };
   }
-};
-
-// Real-time device status listener
-export const listenDeviceStatus = (deviceId, callback) => {
-  return onSnapshot(doc(db, 'devices', deviceId), (doc) => {
-    if (doc.exists()) {
-      callback({ id: doc.id, ...doc.data() });
-    }
-  });
 };
 
 // SMS Functions
@@ -338,4 +319,27 @@ export const getEnrollmentPINs = async () => {
   } catch (error) {
     return { pins: [], error: error.message };
   }
+};
+
+// Real-time listeners
+export const listenDeviceStatus = (deviceId, callback) => {
+  return onSnapshot(doc(db, 'devices', deviceId), (doc) => {
+    if (doc.exists()) {
+      callback({ id: doc.id, ...doc.data() });
+    }
+  });
+};
+
+export const listenDevices = (userId, callback) => {
+  let q = query(devicesCollection, orderBy('registeredAt', 'desc'));
+  if (userId) {
+    q = query(q, where('userId', '==', userId));
+  }
+  return onSnapshot(q, (querySnapshot) => {
+    const devices = [];
+    querySnapshot.forEach((doc) => {
+      devices.push({ id: doc.id, ...doc.data() });
+    });
+    callback(devices);
+  });
 };
