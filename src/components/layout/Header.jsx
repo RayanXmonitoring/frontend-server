@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 import { Menu, Person, Settings, Logout } from '@mui/icons-material';
 import { logout } from '@/lib/firebase/auth';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 
 export default function Header({ toggleSidebar, isMobile }) {
@@ -100,4 +100,4 @@ export default function Header({ toggleSidebar, isMobile }) {
       </div>
     </header>
   );
-}
+                  }
