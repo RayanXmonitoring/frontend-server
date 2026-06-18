@@ -11,11 +11,11 @@ import { auth } from './config';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from './config';
 
+// Fungsi-fungsi auth tetap sama
 export const loginWithEmailPassword = async (email, password) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     
-    // Check if user is suspended
     const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
     if (userDoc.exists() && userDoc.data().isSuspended) {
       await signOut(auth);
