@@ -1,15 +1,14 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
+import { useSession } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const { data: session, status } = useSession();
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,44 +16,32 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
+    if (status === 'loading') {
       setLoading(true);
-      
-      if (authUser) {
-        setUser(authUser);
-        try {
-          const userDoc = await getDoc(doc(db, 'users', authUser.uid));
-          if (userDoc.exists()) {
-            const data = userDoc.data();
-            setUserData(data);
-            setRole(data.role || 'user');
-            
-            // Check if user is suspended
-            if (data.isSuspended) {
-              await signOut(auth);
-              setUser(null);
-              setUserData(null);
-              setRole(null);
-              router.push('/login?error=Akun Anda telah ditangguhkan');
-            }
-          } else {
-            // User document doesn't exist, create one with default role
-            console.warn('User document not found for:', authUser.uid);
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        }
-      } else {
+      return;
+    }
+
+    setLoading(false);
+
+    if (session?.user) {
+      setUser(session.user);
+      setUserData(session.user.userData);
+      setRole(session.user.role || 'user');
+
+      // Check if user is suspended
+      if (session.user.userData?.isSuspended) {
+        signOut({ redirect: false });
         setUser(null);
         setUserData(null);
         setRole(null);
+        router.push('/login?error=Akun Anda telah ditangguhkan');
       }
-      
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [router]);
+    } else {
+      setUser(null);
+      setUserData(null);
+      setRole(null);
+    }
+  }, [session, status, router]);
 
   const value = {
     user,
