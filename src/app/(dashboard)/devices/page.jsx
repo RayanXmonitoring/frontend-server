@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getDevices, updateDeviceStatus } from '@/lib/firebase/firestore';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { Search, FilterList, Refresh, Devices as DevicesIcon } from '@mui/icons-material';
 
 export default function DevicesPage() {
@@ -21,7 +21,7 @@ export default function DevicesPage() {
   const fetchDevices = async () => {
     setLoading(true);
     try {
-      const userId = role === 'admin' ? null : user.uid;
+      const userId = role === 'admin' ? null : user?.uid;
       const { devices: deviceList, error } = await getDevices(userId);
       
       if (error) {
@@ -187,4 +187,4 @@ export default function DevicesPage() {
       )}
     </div>
   );
-  }
+      }
