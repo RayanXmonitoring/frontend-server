@@ -5,7 +5,7 @@ import { auth } from '@/lib/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 
-const handler = NextAuth({
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -15,12 +15,10 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         try {
-          // Validate credentials
           if (!credentials?.email || !credentials?.password) {
             throw new Error('Email dan password wajib diisi');
           }
 
-          // Sign in with Firebase
           const userCredential = await signInWithEmailAndPassword(
             auth,
             credentials.email,
@@ -31,7 +29,6 @@ const handler = NextAuth({
             throw new Error('Login gagal');
           }
 
-          // Get user data from Firestore
           const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
           
           if (!userDoc.exists()) {
@@ -40,12 +37,10 @@ const handler = NextAuth({
 
           const userData = userDoc.data();
 
-          // Check if user is suspended
           if (userData.isSuspended) {
             throw new Error('Akun Anda telah ditangguhkan');
           }
 
-          // Return user object
           return {
             id: userCredential.user.uid,
             email: userCredential.user.email,
@@ -84,10 +79,11 @@ const handler = NextAuth({
   },
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60,
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === 'development',
-});
+};
 
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
