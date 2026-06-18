@@ -1,8 +1,9 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getCurrentUser, getUserRole } from '@/lib/firebase/auth';
-import { getDoc, doc } from 'firebase/firestore';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { useRouter } from 'next/navigation';
 
@@ -16,8 +17,9 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(async (authUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
       setLoading(true);
+      
       if (authUser) {
         setUser(authUser);
         try {
@@ -35,6 +37,9 @@ export const AuthProvider = ({ children }) => {
               setRole(null);
               router.push('/login?error=Akun Anda telah ditangguhkan');
             }
+          } else {
+            // User document doesn't exist, create one
+            console.warn('User document not found for:', authUser.uid);
           }
         } catch (error) {
           console.error('Error fetching user data:', error);
@@ -44,6 +49,7 @@ export const AuthProvider = ({ children }) => {
         setUserData(null);
         setRole(null);
       }
+      
       setLoading(false);
     });
 
@@ -55,7 +61,7 @@ export const AuthProvider = ({ children }) => {
     userData,
     role,
     loading,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && !userData?.isSuspended,
     isAdmin: role === 'admin',
     isReseller: role === 'reseller',
     isUser: role === 'user',
