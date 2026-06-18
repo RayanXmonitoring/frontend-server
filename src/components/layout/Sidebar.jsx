@@ -19,9 +19,8 @@ import {
   Close
 } from '@mui/icons-material';
 import { logout } from '@/lib/firebase/auth';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
 export default function Sidebar({ isOpen, setIsOpen, isMobile }) {
   const pathname = usePathname();
@@ -138,7 +137,6 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile }) {
 
   return (
     <>
-      {/* Mobile overlay */}
       {isMobile && isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40"
@@ -201,4 +199,4 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile }) {
       </aside>
     </>
   );
-}
+                                   }
