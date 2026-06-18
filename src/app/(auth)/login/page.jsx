@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { loginWithEmailPassword } from '@/lib/firebase/auth';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -120,4 +120,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-      }
+}
