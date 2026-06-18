@@ -31,16 +31,16 @@ export default function DeviceStats({ stats }) {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
       {statItems.map((item, index) => (
         <div
           key={index}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 md:p-6 hover:shadow-lg transition-shadow duration-300"
         >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">{item.title}</p>
-              <p className="text-3xl font-bold text-gray-800 dark:text-white mt-2">
+              <p className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mt-2">
                 {item.value}
               </p>
             </div>
