@@ -5,11 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { 
   getDocs, 
   query, 
-  orderBy,
-  doc,
-  updateDoc,
-  deleteDoc,
-  serverTimestamp 
+  orderBy 
 } from 'firebase/firestore';
 import { usersCollection, suspendUser, deleteUser } from '@/lib/firebase/firestore';
 import { toast } from 'react-hot-toast';
@@ -19,7 +15,9 @@ import {
   Delete, 
   Block, 
   CheckCircle,
-  Search 
+  Search,
+  Refresh,
+  People
 } from '@mui/icons-material';
 
 export default function AdminUsersPage() {
@@ -88,29 +86,43 @@ export default function AdminUsersPage() {
       reseller: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
       user: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
     };
+    const labels = {
+      admin: '👑 Admin',
+      reseller: '📦 Reseller',
+      user: '👤 User'
+    };
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[role] || 'bg-gray-100'}`}>
-        {role || 'User'}
+        {labels[role] || role || 'User'}
       </span>
     );
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
           Kelola User
         </h1>
-        <button
-          onClick={() => {
-            setSelectedUser(null);
-            setIsModalOpen(true);
-          }}
-          className="btn-primary flex items-center space-x-2"
-        >
-          <PersonAdd className="w-4 h-4" />
-          <span>Tambah User</span>
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={fetchUsers}
+            className="btn-primary flex items-center space-x-2 text-sm"
+          >
+            <Refresh className="w-4 h-4" />
+            <span>Refresh</span>
+          </button>
+          <button
+            onClick={() => {
+              setSelectedUser(null);
+              setIsModalOpen(true);
+            }}
+            className="btn-success flex items-center space-x-2 text-sm"
+          >
+            <PersonAdd className="w-4 h-4" />
+            <span>Tambah User</span>
+          </button>
+        </div>
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
@@ -175,7 +187,7 @@ export default function AdminUsersPage() {
                           ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                           : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                       }`}>
-                        {user.isSuspended ? 'Nonaktif' : 'Aktif'}
+                        {user.isSuspended ? '⛔ Nonaktif' : '✅ Aktif'}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
@@ -218,8 +230,14 @@ export default function AdminUsersPage() {
               </tbody>
             </table>
           </div>
+          {filteredUsers.length === 0 && (
+            <div className="text-center py-8">
+              <People className="w-12 h-12 mx-auto text-gray-400 mb-2" />
+              <p className="text-gray-500 dark:text-gray-400">Tidak ada user ditemukan</p>
+            </div>
+          )}
         </div>
       )}
     </div>
   );
-                            }
+      }
