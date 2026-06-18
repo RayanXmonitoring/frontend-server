@@ -3,6 +3,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getDatabase } from 'firebase/database';
 
+// Gunakan import dynamic untuk menghindari masalah di server
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -15,14 +16,22 @@ const firebaseConfig = {
 
 // Initialize Firebase
 let app;
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
-} else {
-  app = getApp();
-}
+let auth;
+let db;
+let rtdb;
 
-const auth = getAuth(app);
-const db = getFirestore(app);
-const rtdb = getDatabase(app);
+try {
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+  } else {
+    app = getApp();
+  }
+  
+  auth = getAuth(app);
+  db = getFirestore(app);
+  rtdb = getDatabase(app);
+} catch (error) {
+  console.error('Firebase initialization error:', error);
+}
 
 export { app, auth, db, rtdb };
